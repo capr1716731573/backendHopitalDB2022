@@ -4,11 +4,31 @@ const UsuarioModel = require('../models/usuario.model');
 
 const getUsuarios= async(req, res) =>{
 
-    const usuarios= await UsuarioModel.find({},'nombre email role google');
+    const desde= Number(req.query.desde) || 0;
 
-    res.status(400).json({
+/*     const usuarios= await UsuarioModel
+                            .find({},'nombre email role google')
+                            .skip(desde)//uestra el registro <<desde>> hasta el <<limit>>
+                            .limit(5)
+
+    const totalRegistros= await UsuarioModel.count; */
+
+    //Ejecuta todas esas promesas
+    const[usuarios, total]=await Promise.all([
+        //Primera Promesa para buscar usuarios paginados
+        UsuarioModel
+        .find({},'nombre email role google img')
+        .skip(desde)//uestra el registro <<desde>> hasta el <<limit>>
+        .limit(5),
+        
+        //Segunda Promesa para contar registros
+        UsuarioModel.countDocuments()
+    ])
+
+    res.status(200).json({
         ok:true,
-        usuarios
+        usuarios,
+        registros:total
     })
 };
 
@@ -63,7 +83,7 @@ const updateUsuarios= async(req, res) =>{
 
     try {
         const usuarioDB= await UsuarioModel.findById(uid);
-
+        
         if(!usuarioDB){
             return res.status(400).json({
                 ok:false,
