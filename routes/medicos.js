@@ -21,11 +21,14 @@ router.post('/',[
      
 ],createMedico);
 
-router.put('/:id',[
-   
-     
-],updateMedico);
 
-router.delete('/:id',deleteMedico);
+router.put('/:id',[
+        validarJWT,
+        check('nombre','El nombre del hospital es necesario').not().isEmpty(),
+        validarCampos
+         
+    ],updateMedico);
+    
+router.delete('/:id',validarJWT,deleteMedico);
 
 module.exports= router;

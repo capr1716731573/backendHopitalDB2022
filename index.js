@@ -19,6 +19,10 @@ app.use(cors());
 //Lectura y Parseo del Body
 app.use(express.json());
 
+
+//Middleware temporal para probar el html del boton de google sign in
+app.use(express.static('public'));
+
 //Base de datos
 dbConnection();
 

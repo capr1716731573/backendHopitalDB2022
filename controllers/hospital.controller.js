@@ -1,8 +1,8 @@
 const {response, request} = require('express');
-const Hospital= require('../models/hospitales.model')
+const HospitalModel= require('../models/hospitales.model')
 const getHospitales= async (req=request, res=response) => {
 
-    const hospitales= await Hospital.find()
+    const hospitales= await HospitalModel.find()
                                     .populate('usuario','nombre email img')
 
     res.json({
@@ -14,7 +14,8 @@ const getHospitales= async (req=request, res=response) => {
 const createHospital= async(req=request, res=response) => {
     
     const uid= req.uid;
-    const hospital= new Hospital({
+    console.log('id usuario: '+uid);
+    const hospital= new HospitalModel({
         usuario:uid,
         ...req.body
     });
@@ -36,18 +37,73 @@ const createHospital= async(req=request, res=response) => {
 
 }
 
-const updateHospital= (req=request, res=response) => {
-    res.json({
-        ok:true,
-        msg:'updateHospital'
-    })
+const updateHospital= async (req=request, res=response) => {
+    const id= req.params.id;
+    console.log('id hospital: '+id);
+    const uid= req.uid;
+    console.log('id usuario: '+uid);
+    try {
+        const hospital= await HospitalModel.findById(id);
+
+        if(!hospital){
+            res.status(400).json({
+                ok:false,
+                msg:'Hospital no existe'
+            })
+        }
+
+        const cambiosHospital={
+            ...req.body,
+            usuario:uid
+        }
+
+        const hospitalActualizado= await HospitalModel.findByIdAndUpdate(id, cambiosHospital,{new:true})
+
+        res.json({
+            ok:true,
+            msg:'Hospital Actualizado',
+            hospitalActualizado
+        })
+
+    } catch (error) {
+        res.status(500).json({
+            ok:false,
+            msg:'Error al actualizar, hable con el administrador'
+        })
+    }
+
+   
 }
 
-const deleteHospital= (req=request, res=response) => {
-    res.json({
-        ok:true,
-        msg:'deleteHospital'
-    })
+const deleteHospital= async (req=request, res=response) => {
+    const id= req.params.id;
+    console.log('id hospital: '+id);
+    const uid= req.uid;
+    console.log('id usuario: '+uid);
+    try {
+        const hospital= await HospitalModel.findById(id);
+
+        if(!hospital){
+            res.status(400).json({
+                ok:false,
+                msg:'Hospital no existe'
+            })
+        }
+
+        const hospitalActualizado= await HospitalModel.findByIdAndDelete(id)
+
+        res.json({
+            ok:true,
+            msg:'Hospital Eliminado',
+        })
+
+    } catch (error) {
+        res.status(500).json({
+            ok:false,
+            msg:'Error al eliminar, hable con el administrador'
+        })
+    }
+
 }
 
 module.exports={
