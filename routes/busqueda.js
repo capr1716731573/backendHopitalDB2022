@@ -8,7 +8,7 @@ const { validarJWT } = require('../middleware/validar-jwt');
 const {getTodo, getTodoTabla}=require('../controllers/busqueda.controller');
 const router= Router();
 
-router.get('/:busqueda'
+router.get('/todo/:busqueda'
             ,validarJWT
             ,getTodo);
             

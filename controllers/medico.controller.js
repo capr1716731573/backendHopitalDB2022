@@ -1,4 +1,5 @@
 const {response, request} = require('express');
+const medicosModel = require('../models/medicos.model');
 const Medico= require("../models/medicos.model");
 
 const getMedico= async(req=request, res=response) => {
@@ -10,6 +11,27 @@ const getMedico= async(req=request, res=response) => {
         ok:true,
         medicos
     })
+}
+
+const getMedicoID= async(req=request, res=response) => {
+    const id= req.params.id;
+    try {
+        const medico= await Medico.findById(id)
+        .populate('usuario','nombre img')
+        .populate('hospital','nombre img')
+
+        res.json({
+        ok:true,
+        medico
+        })
+    } catch (error) {
+        res.status(500).json({
+            ok:false,
+            msg:'Error - Hable con Administrador'
+        })    
+    }
+
+   
 }
 
 const createMedico= async (req=request, res=response) => {
@@ -75,22 +97,22 @@ const updateMedico= async (req=request, res=response) => {
 
 const deleteMedico= async (req=request, res=response) => {
     const id= req.params.id;
-    const uid= req.uid;
+    console.log(id)
     try {
-        const hospital= await HospitalModel.findById(id);
+        const medico= await Medico.findById(id);
 
-        if(!hospital){
+        if(!medico){
             res.status(400).json({
                 ok:false,
-                msg:'Hospital no existe'
+                msg:'Médico no existe'
             })
         }
 
-        const hospitalActualizado= await HospitalModel.findByIdAndDelete(id)
+        const medico_actualizado= await medicosModel.findByIdAndDelete(id)
 
         res.json({
             ok:true,
-            msg:'Hospital Eliminado',
+            msg:'Médico Eliminado',
         })
 
     } catch (error) {
@@ -107,5 +129,6 @@ module.exports={
     getMedico,
     createMedico,
     updateMedico,
-    deleteMedico
+    deleteMedico,
+    getMedicoID
 }
